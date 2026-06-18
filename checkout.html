@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Cart</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3.11.0/dist/email.min.js"></script>
+  <style>
+    /* General Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Poppins', sans-serif; background-color: #fefaf6; color: #4e342e; overflow-x: hidden; padding: 20px; }
+
+    .cart-container { max-width: 1000px; margin: auto; background: #fff; border-radius: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.05); overflow: hidden; }
+    h1 { padding: 20px; font-size: 28px; font-weight: 700; color: #5d4037; background: #fff3e6; border-bottom: 1px solid #eee; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 15px; text-align: left; font-size: 14px; color: #4e342e; }
+    th { font-weight: 600; color: #3e2723; background: #fff8f0; }
+    tr { border-bottom: 1px solid #eee; }
+
+    .product { display: flex; align-items: center; gap: 15px; }
+    .product img { width: 60px; border-radius: 12px; border: 3px solid #fff3e6; }
+
+    .qty-control { display: flex; align-items: center; gap: 8px; }
+    .qty-control button { background: #fff3e6; border: none; width: 26px; height: 26px; border-radius: 50%; cursor: pointer; font-weight: 600; color: #5d4037; }
+    .remove-btn { cursor: pointer; color: #d32f2f; font-size: 18px; }
+
+    .shipping { padding: 20px; background: #fff8f0; display: flex; justify-content: space-between; align-items: center; border-radius: 15px; margin: 20px; flex-wrap: wrap; gap: 10px; }
+    .shipping .options { display: flex; flex-direction: column; gap: 10px; }
+    .shipping label { cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 14px; color: #6d4c41; }
+
+    .summary { padding: 20px; background: #fffaf0; border-top: 1px solid #eee; }
+    .summary-item { display: flex; justify-content: space-between; margin: 10px 0; font-size: 15px; }
+    .total { font-size: 20px; font-weight: 700; color: #3e2723; }
+    .checkout-btn { width: 100%; padding: 15px; background: #8d6e63; color: #fff; border: none; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; margin-top: 20px; transition: background 0.3s; }
+    .checkout-btn:hover { background: #6d4c41; }
+    .continue-shopping { margin: 20px 30px; display: inline-block; text-decoration: none; color: #6d4c41; font-size: 14px; }
+
+    /* Customer Info */
+    .customer-info { padding: 20px; }
+    .customer-info h3 { margin-bottom: 10px; font-size: 18px; color: #5d4037; }
+    .customer-info .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .customer-info input {
+      width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 10px; font-size: 14px;
+    }
+    .customer-info input#address { grid-column: 1 / -1; }
+
+    /* Responsive Layout */
+    @media (max-width: 768px) {
+      h1 { font-size: 24px; text-align: center; }
+      th, td { font-size: 12px; padding: 10px; }
+      .product img { width: 50px; }
+      .shipping { flex-direction: column; align-items: flex-start; }
+      .checkout-btn { font-size: 14px; padding: 12px; }
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 20px; }
+      .product { flex-direction: column; align-items: flex-start; }
+      .product img { width: 100%; max-width: 120px; }
+      .summary-item { font-size: 13px; }
+      .total { font-size: 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="cart-container">
+    <h1>My Cart</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>PRODUCT</th>
+          <th>PRICE</th>
+          <th>QTY</th>
+          <th>TOTAL</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="cartItems"></tbody>
+    </table>
+
+    <!-- Customer Info -->
+    <div class="customer-info">
+      <h3>Customer Information</h3>
+      <div class="form-grid">
+        <input type="text" id="firstName" placeholder="First Name" />
+        <input type="text" id="lastName" placeholder="Last Name" />
+        <input type="text" id="phone" placeholder="Phone Number" />
+        <input type="email" id="email" placeholder="Email Address" />
+        <input type="text" id="address" placeholder="Full Address" />
+      </div>
+    </div>
+
+    <div class="shipping">
+      <div class="options">
+        <label><input type="radio" name="shipping" value="0" checked> Store pickup - FREE</label>
+        <label><input type="radio" name="shipping" value="10"> Delivery at home - ₹10</label>
+      </div>
+    </div>
+
+    <div class="summary">
+      <div class="summary-item"><span>SUBTOTAL TTC</span><span>₹<span id="cartTotal">0</span></span></div>
+      <div class="summary-item"><span>SHIPPING</span><span id="shippingCost">Free</span></div>
+      <div class="summary-item total"><span>TOTAL</span><span>₹<span id="totalAmount">0</span></span></div>
+      <button class="checkout-btn">Checkout</button>
+      <a href="shop.html" class="continue-shopping">← Continue shopping</a>
+    </div>
+  </div>
+
+  <script>
+    emailjs.init("cm8j8YV-GgZ-3x0_o");
+
+    function updateCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const tbody = document.getElementById("cartItems");
+      tbody.innerHTML = "";
+      let subtotal = 0;
+
+      cart.forEach((item, index) => {
+        const total = item.qty * item.price;
+        subtotal += total;
+        const row = `
+          <tr>
+            <td>
+              <div class="product">
+                <img src="${item.image}" alt="${item.name}"/>
+                <div>
+                  <strong>${item.name}</strong><br>
+                  <small>Color: ${item.color || "Default"}</small>
+                </div>
+              </div>
+            </td>
+            <td>₹${item.price.toFixed(2)}</td>
+            <td>
+              <div class="qty-control">
+                <button onclick="changeQty(${index}, -1)">-</button>
+                <span>${item.qty}</span>
+                <button onclick="changeQty(${index}, 1)">+</button>
+              </div>
+            </td>
+            <td>₹${total.toFixed(2)}</td>
+            <td><span class="remove-btn" onclick="removeItem(${index})">&times;</span></td>
+          </tr>
+        `;
+        tbody.innerHTML += row;
+      });
+
+      document.getElementById("cartTotal").innerText = subtotal.toFixed(2);
+      updateTotal();
+    }
+
+    function changeQty(index, delta) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart[index].qty += delta;
+      if (cart[index].qty <= 0) cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function removeItem(index) {
+      let cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      updateCart();
+    }
+
+    function updateTotal() {
+      const subtotal = parseFloat(document.getElementById("cartTotal").innerText);
+      const shipping = document.querySelector('input[name="shipping"]:checked').value;
+      const shippingCost = parseFloat(shipping);
+      document.getElementById("shippingCost").innerText = shippingCost === 0 ? "Free" : `₹${shippingCost.toFixed(2)}`;
+      document.getElementById("totalAmount").innerText = (subtotal + shippingCost).toFixed(2);
+    }
+
+    document.querySelectorAll('input[name="shipping"]').forEach(radio => {
+      radio.addEventListener("change", updateTotal);
+    });
+
+    function generateOrderID() {
+      return 'ORD' + Math.floor(Math.random() * 1000000).toString().padStart(6, '0');
+    }
+
+    document.querySelector(".checkout-btn").addEventListener("click", () => {
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const address = document.getElementById("address").value.trim();
+      const total = document.getElementById("totalAmount").innerText;
+      const delivery = document.querySelector('input[name="shipping"]:checked').nextSibling.textContent.trim();
+      const payment = "COD";
+      const orderID = generateOrderID();
+
+      if (!firstName || !lastName || !phone || !email || !address) {
+        alert("⚠️ Please fill in all fields.");
+        return;
+      }
+
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartDetails = cart.map(item => `${item.name} x${item.qty} - ₹${item.price}`).join("\n");
+
+      const existingOrders = JSON.parse(localStorage.getItem("orders")) || [];
+      existingOrders.push({
+        name: `${firstName} ${lastName}`,
+        email,
+        phone,
+        orderID,
+        delivery,
+        payment,
+        address,
+        total,
+        cart
+      });
+      localStorage.setItem("orders", JSON.stringify(existingOrders));
+
+      emailjs.send("service_3tow59f", "template_ip6oa93", {
+        firstName,
+        lastName,
+        phone,
+        email,
+        address,
+        total,
+        cartDetails,
+        orderID,
+        delivery,
+        payment
+      }).then(() => {
+        alert("✅ Order sent to your email.");
+        localStorage.removeItem('cart');
+        window.location.href = "order.html";
+      }).catch(err => {
+        console.error("Email send error:", err);
+        alert("❌ Failed to send order.");
+      });
+    });
+
+    document.addEventListener("DOMContentLoaded", updateCart);
+  </script>
+</body>
+</html>

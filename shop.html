@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>YOZA Store</title>
+  <link rel="stylesheet" href="shop.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .cart-icon {
+      cursor: pointer;
+      font-size: 1.2rem;
+      margin-left: 20px;
+      color: #d97629;
+    }
+
+    /* Hamburger menu button */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      margin-left: 15px;
+    }
+    .hamburger span {
+      height: 3px;
+      width: 25px;
+      background: #5d4037;
+      margin: 4px 0;
+      border-radius: 3px;
+      transition: 0.3s;
+    }
+
+    /* Mobile menu dropdown */
+    .mobile-menu {
+      display: none;
+      flex-direction: column;
+      background: #fff3e6;
+      position: absolute;
+      top: 60px;
+      right: 10px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 1rem;
+      z-index: 9999;
+    }
+    .mobile-menu a {
+      text-decoration: none;
+      color: #6d4c41;
+      padding: 10px 0;
+      font-weight: 500;
+    }
+    .mobile-menu a:hover {
+      color: #8d6e63;
+    }
+
+    /* Show hamburger on small screens */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+      .hamburger {
+        display: flex;
+      }
+    }
+
+    #cartPanel {
+      display: none;
+      position: fixed;
+      right: 0;
+      top: 0;
+      width: 350px;
+      height: 100vh;
+      background: #fff;
+      box-shadow: -5px 0 20px rgba(0,0,0,0.2);
+      padding: 20px;
+      z-index: 1000;
+      overflow-y: auto;
+    }
+    .cart-item {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .cart-item img {
+      width: 50px;
+      border-radius: 6px;
+    }
+    .cart-item-info {
+      flex: 1;
+      margin-left: 10px;
+    }
+    .remove-btn {
+      color: red;
+      cursor: pointer;
+      font-size: 0.8rem;
+    }
+    /* Updated Search Bar */
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin: 1.5rem auto;
+      max-width: 500px;
+    }
+    .search-bar input {
+      flex: 1;
+      padding: 0.7rem 1rem;
+      border: 2px solid #e0cfc2;
+      border-radius: 30px;
+      font-size: 1rem;
+      color: #5d4037;
+      background: #fffaf6;
+      outline: none;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      font-family: 'Poppins', sans-serif;
+    }
+    .search-bar input:focus {
+      border-color: #8d6e63;
+      box-shadow: 0 0 8px rgba(141, 110, 99, 0.3);
+    }
+    /* Updated Category Buttons */
+    .category-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 1rem auto;
+      flex-wrap: wrap;
+    }
+    .category-buttons button {
+      padding: 0.7rem 1.5rem;
+      border: none;
+      border-radius: 30px;
+      background: #8d6e63;
+      color: white;
+      font-weight: 600;
+      font-family: 'Poppins', sans-serif;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .category-buttons button:hover {
+      background: #6d4c41;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero-section">
+    <nav class="navbar">
+      <div class="logo">YOZA</div>
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="#menu">Menu</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="order.html">Order</a></li>
+      </ul>
+      <div style="display: flex; align-items: center;">
+        <div class="cart-icon" id="cartIcon">🛒<span id="cartCount" style="color: red; margin-left: 5px;">0</span></div>
+        <div class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Mobile menu -->
+    <div class="mobile-menu" id="mobileMenu">
+      <a href="index.html">Home</a>
+      <a href="#menu">Menu</a>
+      <a href="about.html">About</a>
+      <a href="order.html">Order</a>
+    </div>
+
+    <div class="hero-content">
+      <div class="text">
+        <h1>I duh tur chi tak<br> Han en kual chhin la</h1>
+        <p>Kawr leh pheikhawk chi hrang hrang kan nei a. I duh ber kha rawn thlang la kan lo deliver sak thlap ang che.</p>
+        <div class="hero-buttons">
+          <a href="#menu" class="btn">Chi hrang hrang a awm e</a>
+          <a href="#book" class="btn light">Make an order</a>
+        </div>
+      </div>
+      <div class="hero-image">
+        <img src="images/burger.png" alt="Food Bowl" />
+      </div>
+    </div>
+  </header>
+
+  <div class="search-bar">
+    <input type="text" id="searchInput" placeholder="Search for food...">
+  </div>
+
+  <!-- Category Filter Buttons -->
+  <div class="category-buttons">
+    <button data-category="all">All</button>
+    <button data-category="men">Men</button>
+    <button data-category="women">Women</button>
+    <button data-category="electronics">Electronics</button>
+    <button data-category="food">Food</button>
+  </div>
+
+  <section id="menu" class="top-list">
+      <h2>Anything you like?</h2>
+    <p class="subheading">Search around, take your time</p>
+    <div class="menu-grid" id="menuGrid">
+      <a href="products/product1.html" class="menu-item" data-category="food" style="text-decoration: none;">
+        <img src="images/longsleeves.jpg" alt="Noodles Three">
+        <h3 style="color: #d97629;">Buldak Noodles</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">₹70</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product2.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Buldak Noodles</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">₹70</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product3.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product4.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product5.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product6.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">₹300</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product7.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product8.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product9.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+      <a href="products/product10.html" class="menu-item" style="text-decoration: none;">
+        <img src="images/burger.png" alt="Noodles Three">
+        <h3 style="color: #d97629;">Noodles three</h3>
+        <p>White plate with dried shrimps</p>
+        <span class="price">12$</span>
+        <span class="rating">⭐ 8.1</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="highlight">
+    <div class="highlight-content">
+      <img src="images/burger.png" alt="French Fries">
+      <div class="highlight-text">
+        <h2>I duhthusam i hmu em</h2>
+        <p>He pheikhawk te hi i ngainat zawng a ni lo em ni? A detail i hriat duh chuan hmet tawp rawh</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="services">
+    <h2>Our services</h2>
+    <div class="service-icons">
+      <div>🛒 Shipping to other state</div>
+      <div>🚚 Delivery service</div>
+    </div>
+  </section>
+
+  <footer>
+    <p>©2025 YOZA's Store. All rights reserved.</p>
+  </footer>
+
+  <div id="cartPanel">
+    <h3>Shopping Cart</h3>
+    <div id="cartItems"></div>
+    <div style="margin-top: 1rem; border-top: 1px solid #ccc; padding-top: 1rem;">
+      <strong>Subtotal: ₹<span id="cartTotal">0</span></strong>
+      <a href="checkout.html" style="display: inline-block; text-align: center; margin-top: 1rem; width: 100%; padding: 10px; background: #000; color: white; border: none; border-radius: 5px; text-decoration: none;">Checkout</a>
+  </div>
+
+  <script>
+    // Cart logic
+    function loadCart() {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      const cartItems = document.getElementById('cartItems');
+      const cartCount = document.getElementById('cartCount');
+      const cartTotal = document.getElementById('cartTotal');
+      let totalQty = 0;
+      let total = 0;
+
+      cartItems.innerHTML = '';
+
+      cart.forEach((item, index) => {
+        totalQty += item.qty;
+        total += item.qty * item.price;
+
+        cartItems.innerHTML += `
+          <div class="cart-item">
+            <img src="${item.image}" alt="${item.name}" />
+            <div class="cart-item-info">
+              <strong>${item.name}</strong><br>
+              Qty: ${item.qty} <span class="remove-btn" onclick="removeItem(${index})">Remove</span>
+            </div>
+            <div>₹${(item.price * item.qty).toFixed(2)}</div>
+          </div>
+        `;
+      });
+
+      cartCount.textContent = totalQty;
+      cartTotal.textContent = total.toFixed(2);
+    }
+
+    function removeItem(index) {
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      cart.splice(index, 1);
+      localStorage.setItem('cart', JSON.stringify(cart));
+      setTimeout(() => loadCart(), 100);
+    }
+
+    document.getElementById("cartIcon").addEventListener("click", (e) => {
+      e.stopPropagation();
+      const panel = document.getElementById("cartPanel");
+      panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+      loadCart();
+    });
+
+    document.addEventListener("click", (e) => {
+      const panel = document.getElementById("cartPanel");
+      const icon = document.getElementById("cartIcon");
+      if (!panel.contains(e.target) && !icon.contains(e.target)) {
+        panel.style.display = 'none';
+      }
+    });
+
+    // Hamburger toggle
+    const hamburger = document.getElementById("hamburger");
+    const mobileMenu = document.getElementById("mobileMenu");
+
+    if(hamburger){
+      hamburger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        mobileMenu.style.display = mobileMenu.style.display === "flex" ? "none" : "flex";
+      });
+    }
+
+    document.addEventListener("click", (e) => {
+      if(mobileMenu && hamburger && !hamburger.contains(e.target) && !mobileMenu.contains(e.target)){
+        mobileMenu.style.display = "none";
+      }
+    });
+
+    // Search filter function
+    document.getElementById("searchInput").addEventListener("input", function () {
+      const query = this.value.toLowerCase();
+      const items = document.querySelectorAll(".menu-grid a");
+      items.forEach(item => {
+        const name = item.querySelector("h3").textContent.toLowerCase();
+        item.style.display = name.includes(query) ? "block" : "none";
+      });
+    });
+
+    // Category filter logic
+    document.querySelectorAll('.category-buttons button').forEach(button => {
+      button.addEventListener('click', () => {
+        const selected = button.getAttribute('data-category');
+        document.querySelectorAll('.menu-item').forEach(item => {
+          const itemCategory = item.getAttribute('data-category');
+          if (selected === 'all' || itemCategory === selected) {
+            item.style.display = 'block';
+          } else {
+            item.style.display = 'none';
+          }
+        });
+      });
+    });
+
+    loadCart();
+  </script>
+</body>
+</html>

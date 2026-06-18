@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login – YOZA Store</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="auth.css" />
+</head>
+<body>
+
+  <!-- Main -->
+  <main class="auth-wrapper">
+    <div class="auth-card">
+      <h2>Welcome back!</h2>
+      <p class="subtitle">Sign in to your YOZA account</p>
+
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <a href="login.html" class="auth-tab active">Login</a>
+        <a href="register.html" class="auth-tab">Register</a>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert error" id="errorAlert"></div>
+      <div class="alert success" id="successAlert"></div>
+
+      <!-- Social Login -->
+      <a href="#" class="social-btn" id="googleBtn">
+        <svg class="social-icon" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.1 0 5.8 1.1 7.9 2.9l5.9-5.9C34.1 3.5 29.3 1.5 24 1.5 14.9 1.5 7.1 7.2 3.9 15.1l6.9 5.4C12.4 14 17.7 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.1 24.5c0-1.5-.1-3-.4-4.5H24v8.5h12.5c-.5 2.9-2.2 5.3-4.6 7l7.1 5.5c4.2-3.9 6.6-9.6 6.6-16.5z"/>
+          <path fill="#FBBC05" d="M10.8 28.5A14.7 14.7 0 0 1 9.5 24c0-1.6.3-3.1.8-4.5L3.4 14C1.9 16.9 1 20.4 1 24s.9 7.1 2.4 10l7.4-5.5z"/>
+          <path fill="#34A853" d="M24 46.5c5.3 0 9.8-1.7 13-4.7l-7.1-5.5c-1.9 1.3-4.3 2-5.9 2-6.3 0-11.6-4.3-13.2-10l-6.9 5.4C7.1 40.8 14.9 46.5 24 46.5z"/>
+        </svg>
+        Continue with Google
+      </a>
+
+      <!-- Divider -->
+      <div class="divider">or sign in with email</div>
+
+      <!-- Login Form -->
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" required />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required />
+        </div>
+
+        <a href="#" class="forgot-link">Forgot password?</a>
+
+        <div class="checkbox-row">
+          <input type="checkbox" id="rememberMe" />
+          <label for="rememberMe">Keep me signed in</label>
+        </div>
+
+        <button type="submit" class="submit-btn">Sign In</button>
+      </form>
+
+      <p class="switch-text">Don't have an account? <a href="register.html">Create one</a></p>
+    </div>
+  </main>
+
+  <footer>
+    ©2025 YOZA's Store. All rights reserved.
+  </footer>
+
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorAlert = document.getElementById('errorAlert');
+    const successAlert = document.getElementById('successAlert');
+
+    function showAlert(type, message) {
+      errorAlert.style.display = 'none';
+      successAlert.style.display = 'none';
+      if (type === 'error') {
+        errorAlert.textContent = message;
+        errorAlert.style.display = 'block';
+      } else {
+        successAlert.textContent = message;
+        successAlert.style.display = 'block';
+      }
+    }
+
+    loginForm.addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!email || !password) {
+        showAlert('error', '⚠️ Please fill in all fields.');
+        return;
+      }
+
+      // Check against stored users
+      const users = JSON.parse(localStorage.getItem('yoza_users')) || [];
+      const user = users.find(u => u.email === email && u.password === password);
+
+      if (!user) {
+        showAlert('error', '❌ Incorrect email or password.');
+        return;
+      }
+
+      // Store session
+      localStorage.setItem('yoza_session', JSON.stringify({ name: user.name, email: user.email }));
+
+      showAlert('success', `✅ Welcome back, ${user.name}! Redirecting...`);
+      setTimeout(() => {
+        window.location.href = 'index.html';
+      }, 1500);
+    });
+
+    document.getElementById('googleBtn').addEventListener('click', function (e) {
+      e.preventDefault();
+      showAlert('error', '⚠️ Google login is not configured yet.');
+    });
+  </script>
+</body>
+</html>
